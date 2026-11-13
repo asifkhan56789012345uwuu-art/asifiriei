@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Asif Browser - Zero Gravity & Mega Cloud Vault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@600;800&family=Fira+Code:wght@400;600&family=Hind+Siliguri:wght@400;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #030712;
+            --bg-panel: rgba(15, 23, 42, 0.85);
+            --accent: #00f5d4;
+            --accent-glow: rgba(0, 245, 212, 0.45);
+            --text-main: #f8fafc;
+            --border-color: rgba(0, 245, 212, 0.35);
+        }
+
+        /* ৫টি ভিন্ন হোম স্ক্রিন থিম */
+        body.theme-cyber { --bg-primary: #030712; --bg-panel: rgba(15, 23, 42, 0.88); --accent: #00f5d4; --accent-glow: rgba(0, 245, 212, 0.45); --border-color: rgba(0, 245, 212, 0.35); }
+        body.theme-matrix { --bg-primary: #021409; --bg-panel: rgba(6, 36, 18, 0.88); --accent: #22c55e; --accent-glow: rgba(34, 197, 94, 0.45); --border-color: rgba(34, 197, 94, 0.35); }
+        body.theme-sunset { --bg-primary: #1a0606; --bg-panel: rgba(45, 12, 12, 0.88); --accent: #fb923c; --accent-glow: rgba(251, 146, 60, 0.45); --border-color: rgba(251, 146, 60, 0.35); }
+        body.theme-galaxy { --bg-primary: #110424; --bg-panel: rgba(32, 10, 64, 0.88); --accent: #e879f9; --accent-glow: rgba(232, 121, 249, 0.45); --border-color: rgba(232, 121, 249, 0.35); }
+        body.theme-gold { --bg-primary: #171102; --bg-panel: rgba(41, 30, 5, 0.88); --accent: #facc15; --accent-glow: rgba(250, 204, 21, 0.45); --border-color: rgba(250, 204, 21, 0.35); }
+
+        body.glow-off {
+            --accent-glow: transparent;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: 'Hind Siliguri', 'Inter', sans-serif;
+            overflow: hidden;
+            transition: background-color 0.4s ease;
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-code { font-family: 'Fira Code', monospace; }
+        .font-hand { font-family: 'Reenie Beanie', cursive; font-size: 1.5rem !important; }
+        .font-modern { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+
+        .neon-border {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 18px var(--accent-glow);
+        }
+
+        .neon-text {
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .accent-bg {
+            background-color: var(--accent);
+            color: #030712;
+        }
+
+        .panel-glass {
+            background: var(--bg-panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        /* জিরো গ্র্যাভিটি ভাসমান অক্ষর */
+        .floating-letter {
+            position: absolute;
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: var(--bg-panel);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            z-index: 20;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+
+        .floating-letter:active {
+            cursor: grabbing;
+            transform: scale(1.18);
+            z-index: 50;
+        }
+
+        /* টার্গেট স্লট */
+        .letter-slot {
+            width: 46px;
+            height: 52px;
+            border-radius: 12px;
+            border: 2px dashed var(--accent);
+            background: rgba(0, 0, 0, 0.45);
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .letter-slot.filled {
+            border-style: solid;
+            background: var(--accent);
+            color: #030712;
+            box-shadow: 0 0 14px var(--accent-glow);
+        }
+
+        /* কাস্টম স্ক্রলবার */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        /* টোস্ট মেসেজ বক্স */
+        #toast-box {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: #030712;
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #toast-box.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body class="theme-cyber">
+
+    <!-- কাস্টম নোটিফিকেশন টোস্ট -->
+    <div id="toast-box">বার্তা</div>
+
+    <!-- ========================================== -->
+    <!-- ১. ফুল-স্ক্রিন জিরো-গ্র্যাভিটি লক স্ক্রিন -->
+    <!-- ========================================== -->
+    <section id="lock-screen" class="fixed inset-0 w-full h-full flex flex-col justify-between p-4 z-50 overflow-hidden">
+        <!-- উপরের হেডার -->
+        <div class="panel-glass neon-border rounded-2xl px-4 py-3 text-center max-w-md mx-auto w-full relative z-30">
+            <div class="flex items-center justify-center gap-2">
+                <i id="lock-logo-icon" class="fa-solid fa-shield-halved neon-text text-xl"></i>
+                <h1 id="lock-app-title" class="font-orbitron text-lg sm:text-xl font-bold neon-text tracking-wider">ASIF BROWSER</h1>
+            </div>
+            <p class="text-xs text-slate-300 mt-1">ভাসমান অক্ষরগুলো টেনে বা ট্যাপ করে নিচে বসান: উপরে <b>ASIF</b> এবং নিচে <b>KHAN</b></p>
+        </div>
+
+        <!-- জিরো-গ্র্যাভিটি ভাসমান অক্ষরের ফিল্ড -->
+        <div id="gravity-canvas" class="absolute inset-0 w-full h-full overflow-hidden"></div>
+
+        <!-- নিচের টার্গেট স্লট ও বাটন প্যানেল -->
+        <div class="panel-glass neon-border rounded-3xl p-4 max-w-md mx-auto w-full flex flex-col items-center gap-3 relative z-30 mb-1">
+            <!-- ১ম সারি: A S I F -->
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-60 w-9 text-right">১ম:</span>
+                <div class="letter-slot" data-slot="0" onclick="removeLetterFromSlot(0)"></div>
+                <div class="letter-slot" data-slot="1" onclick="removeLetterFromSlot(1)"></div>
+                <div class="letter-slot" data-slot="2" onclick="removeLetterFromSlot(2)"></div>
+                <div class="letter-slot" data-slot="3" onclick="removeLetterFromSlot(3)"></div>
+            </div>
+
+            <!-- ২য় সারি: K H A N -->
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-60 w-9 text-right">২য়:</span>
+                <div class="letter-slot" data-slot="4" onclick="removeLetterFromSlot(4)"></div>
+                <div class="letter-slot" data-slot="5" onclick="removeLetterFromSlot(5)"></div>
+                <div class="letter-slot" data-slot="6" onclick="removeLetterFromSlot(6)"></div>
+                <div class="letter-slot" data-slot="7" onclick="removeLetterFromSlot(7)"></div>
+            </div>
+
+            <!-- ভুল হলে এরর মেসেজ -->
+            <div id="lock-error-msg" class="text-rose-400 text-xs font-semibold h-4 text-center"></div>
+
+            <!-- অ্যাকশন বাটন -->
+            <div class="flex gap-3 w-full justify-center">
+                <button onclick="initZeroGravityLock()" class="px-5 py-2.5 rounded-xl border border-slate-600 bg-slate-800/80 text-slate-200 text-sm font-semibold active:scale-95 transition flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> রিসেট
+                </button>
+                <button onclick="attemptUnlock()" class="px-7 py-2.5 rounded-xl accent-bg text-sm font-bold active:scale-95 transition flex items-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-unlock-keyhole"></i> OK / আনলক
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ২. মেইন আসিফ ব্রাউজার ইন্টারফেস -->
+    <!-- ========================================== -->
+    <main id="browser-app" class="hidden fixed inset-0 w-full h-full flex flex-col z-40">
+        
+        <!-- ব্রাউজার টপ ক্রোম (URL বার ও কন্ট্রোল) -->
+        <header class="panel-glass border-b border-slate-800 px-3 pt-2.5 pb-2 flex flex-col gap-2 shrink-0">
+            <div class="flex items-center justify-between gap-2">
+                <!-- ব্র্যান্ড লোগো ও নাম -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <div class="w-8 h-8 rounded-xl accent-bg flex items-center justify-center font-bold text-base shadow">
+                        <i id="header-logo-icon" class="fa-solid fa-globe"></i>
+                    </div>
+                    <span id="header-app-name" class="font-orbitron font-bold text-xs sm:text-sm neon-text hidden sm:inline">ASIF BROWSER</span>
+                </div>
+
+                <!-- ব্রাউজার অ্যাড্রেস বার -->
+                <div class="flex-1 flex items-center bg-black/50 neon-border rounded-xl px-3 py-1.5 text-xs overflow-hidden">
+                    <i class="fa-solid fa-lock text-emerald-400 mr-2 shrink-0"></i>
+                    <span id="browser-url-text" class="truncate neon-text font-code">https://asif-browser.cloud/home</span>
+                </div>
+
+                <!-- শেয়ার ও লক বাটন -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="copyBrowserLink()" title="লিংক কপি করুন" class="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 neon-text border border-slate-700 text-xs active:scale-95 transition">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button>
+                    <button onclick="lockBrowser()" title="ব্রাউজার লক করুন" class="px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs active:scale-95 transition flex items-center gap-1">
+                        <i class="fa-solid fa-lock"></i> <span class="hidden sm:inline">লক</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- মাল্টি-ট্যাব নেভিগেশন বার -->
+            <nav class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                <button onclick="openBrowserTab('home', this)" class="tab-btn active-tab px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 accent-bg transition">
+                    <i class="fa-solid fa-house"></i> হোম
+                </button>
+                <button onclick="openBrowserTab('gallery', this)" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-slate-800/80 text-slate-300 border border-slate-700 transition">
+                    <i class="fa-solid fa-images"></i> ছবি গ্যালারি
+                </button>
+                <button onclick="openBrowserTab('vault', this)" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-slate-800/80 text-slate-300 border border-slate-700 transition">
+                    <i class="fa-solid fa-folder-open"></i> ফাইল ভল্ট
+                </button>
+                <button onclick="openBrowserTab('notepad', this)" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-slate-800/80 text-slate-300 border border-slate-700 transition">
+                    <i class="fa-solid fa-pen-to-square"></i> স্মার্ট নোটপ্যাড
+                </button>
+                <button onclick="openBrowserTab('coder', this)" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-slate-800/80 text-slate-300 border border-slate-700 transition">
+                    <i class="fa-solid fa-code"></i> কোডিং স্টুডিও
+                </button>
+                <button onclick="openBrowserTab('recorder', this)" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 bg-slate-800/80 text-slate-300 border border-slate-700 transition">
+                    <i class="fa-solid fa-microphone"></i> ভয়েস রেকর্ড
+                </button>
+            </nav>
+        </header>
+
+        <!-- ব্রাউজার কন্টেন্ট এরিয়া -->
+        <div class="flex-1 overflow-y-auto p-3 sm:p-5 space-y-5">
+
+            <!-- ==================================== -->
+            <!-- ট্যাব ১: হোম ড্যাশবোর্ড ও কাস্টমাইজেশন -->
+            <!-- ==================================== -->
+            <div id="view-home" class="browser-view space-y-5 max-w-4xl mx-auto">
+                <!-- ওয়েলকাম ব্যানার -->
+                <div class="panel-glass neon-border rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-[11px] uppercase tracking-widest px-2.5 py-0.5 rounded-full accent-bg font-bold">Permanent Local Cloud Active</span>
+                        <h2 class="text-xl sm:text-2xl font-bold mt-2">স্বাগতম, <span id="welcome-owner-name" class="neon-text">আসিফ খান</span>!</h2>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1">আপনার সব ছবি, ফাইল, ভয়েস এবং নোট ব্রাউজারের স্থায়ী ডাটাবেসে (IndexedDB) সুরক্ষিত আছে—পেজ রিলোড করলেও কখনো মুছবে না।</p>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <div class="text-center bg-black/40 border border-slate-700 rounded-xl px-3 py-2">
+                            <div id="stat-photos" class="text-lg font-bold neon-text">0</div>
+                            <div class="text-[10px] text-slate-400">ছবি</div>
+                        </div>
+                        <div class="text-center bg-black/40 border border-slate-700 rounded-xl px-3 py-2">
+                            <div id="stat-files" class="text-lg font-bold neon-text">0</div>
+                            <div class="text-[10px] text-slate-400">ফাইল</div>
+                        </div>
+                        <div class="text-center bg-black/40 border border-slate-700 rounded-xl px-3 py-2">
+                            <div id="stat-audios" class="text-lg font-bold neon-text">0</div>
+                            <div class="text-[10px] text-slate-400">রেকর্ড</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- কুইক অ্যাক্সেস শর্টকাট কার্ডস -->
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt neon-text"></i> কুইক অ্যাপস ও ভল্ট মেনু
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button onclick="triggerTabClick('gallery')" class="panel-glass neon-border rounded-2xl p-4 text-left hover:scale-[1.02] active:scale-95 transition flex flex-col gap-2">
+                            <div class="w-10 h-10 rounded-xl accent-bg flex items-center justify-center text-lg"><i class="fa-solid fa-images"></i></div>
+                            <div class="font-bold text-sm">স্থায়ী ছবি গ্যালারি</div>
+                            <div class="text-[11px] text-slate-400">ফুল HD ছবি সেভ ও ভিউ</div>
+                        </button>
+                        <button onclick="triggerTabClick('vault')" class="panel-glass neon-border rounded-2xl p-4 text-left hover:scale-[1.02] active:scale-95 transition flex flex-col gap-2">
+                            <div class="w-10 h-10 rounded-xl accent-bg flex items-center justify-center text-lg"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                            <div class="font-bold text-sm">ফাইল স্টোরেজ</div>
+                            <div class="text-[11px] text-slate-400">PDF, অডিও, ZIP ফাইল</div>
+                        </button>
+                        <button onclick="triggerTabClick('notepad')" class="panel-glass neon-border rounded-2xl p-4 text-left hover:scale-[1.02] active:scale-95 transition flex flex-col gap-2">
+                            <div class="w-10 h-10 rounded-xl accent-bg flex items-center justify-center text-lg"><i class="fa-solid fa-book"></i></div>
+                            <div class="font-bold text-sm">মেগা নোটপ্যাড</div>
+                            <div class="text-[11px] text-slate-400">কাস্টম কিবোর্ড ও ফন্ট</div>
+                        </button>
+                        <button onclick="triggerTabClick('coder')" class="panel-glass neon-border rounded-2xl p-4 text-left hover:scale-[1.02] active:scale-95 transition flex flex-col gap-2">
+                            <div class="w-10 h-10 rounded-xl accent-bg flex items-center justify-center text-lg"><i class="fa-solid fa-laptop-code"></i></div>
+                            <div class="font-bold text-sm">লাইভ কোডিং</div>
+                            <div class="text-[11px] text-slate-400">HTML/JS রান ও প্রিভিউ</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ৫টি হোম স্ক্রিন লুক ও থিম সুইচার -->
+                <div class="panel-glass neon-border rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-palette neon-text"></i> ৫ রকমের হোম স্ক্রিন লুক ও থিম
+                        </h3>
+                        <button onclick="toggleLightingGlow()" id="glow-toggle-btn" class="px-3 py-1 rounded-lg text-xs font-bold border border-slate-600 bg-slate-800 neon-text">
+                            <i class="fa-solid fa-lightbulb"></i> লাইটিং: ON
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                        <button onclick="applyBrowserTheme('theme-cyber')" class="p-2.5 rounded-xl border border-cyan-400/50 bg-slate-900 text-cyan-300 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                            <span class="w-3 h-3 rounded-full bg-cyan-400"></span> ১. সাইবার নিয়ন
+                        </button>
+                        <button onclick="applyBrowserTheme('theme-matrix')" class="p-2.5 rounded-xl border border-emerald-400/50 bg-emerald-950 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                            <span class="w-3 h-3 rounded-full bg-emerald-400"></span> ২. ম্যাট্রিক্স গ্রিন
+                        </button>
+                        <button onclick="applyBrowserTheme('theme-sunset')" class="p-2.5 rounded-xl border border-orange-400/50 bg-orange-950 text-orange-300 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                            <span class="w-3 h-3 rounded-full bg-orange-400"></span> ৩. সানসেট ফায়ার
+                        </button>
+                        <button onclick="applyBrowserTheme('theme-galaxy')" class="p-2.5 rounded-xl border border-fuchsia-400/50 bg-purple-950 text-fuchsia-300 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                            <span class="w-3 h-3 rounded-full bg-fuchsia-400"></span> ৪. পার্পল গ্যালাক্সি
+                        </button>
+                        <button onclick="applyBrowserTheme('theme-gold')" class="p-2.5 rounded-xl border border-yellow-400/50 bg-yellow-950 text-yellow-300 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 col-span-2 sm:col-span-1">
+                            <span class="w-3 h-3 rounded-full bg-yellow-400"></span> ৫. রয়্যাল গোল্ড
+                        </button>
+                    </div>
+                </div>
+
+                <!-- অ্যাপ লোগো ও নাম কাস্টমাইজেশন -->
+                <div class="panel-glass neon-border rounded-2xl p-4 space-y-3">
+                    <h3 class="text-sm font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles neon-text"></i> ব্রাউজার লোগো ও নাম পরিবর্তন করুন
+                    </h3>
+                    <div class="flex flex-col sm:flex-row gap-2.5">
+                        <input type="text" id="custom-brand-input" placeholder="নতুন ব্রাউজার নাম লিখুন (যেমন: ASIF PRO)" class="flex-1 bg-black/50 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-cyan-400">
+                        <button onclick="updateBrandName()" class="px-4 py-2 rounded-xl accent-bg font-bold text-xs active:scale-95">নাম সেভ করুন</button>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap pt-1">
+                        <span class="text-xs text-slate-400">লোগো আইকন বাছাই করুন:</span>
+                        <button onclick="updateBrandLogo('fa-globe')" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 neon-text"><i class="fa-solid fa-globe"></i></button>
+                        <button onclick="updateBrandLogo('fa-dragon')" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 neon-text"><i class="fa-solid fa-dragon"></i></button>
+                        <button onclick="updateBrandLogo('fa-rocket')" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 neon-text"><i class="fa-solid fa-rocket"></i></button>
+                        <button onclick="updateBrandLogo('fa-crown')" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 neon-text"><i class="fa-solid fa-crown"></i></button>
+                        <button onclick="updateBrandLogo('fa-user-secret')" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 neon-text"><i class="fa-solid fa-user-secret"></i></button>
+                        <button onclick="updateBrandLogo('fa-atom')" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 neon-text"><i class="fa-solid fa-atom"></i></button>
+                    </div>
+                </div>
+
+                <!-- ব্রাউজার লিংক ও হোস্টিং নির্দেশিকা (কেন 192.168 কাজ করে না তার সমাধান) -->
+                <div class="panel-glass border border-amber-500/40 rounded-2xl p-4 space-y-2">
+                    <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info"></i> এই ব্রাউজারটি স্থায়ী অনলাইন লিংকে চালানোর উপায়
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        মোবাইল কোডিং অ্যাপের লোকাল সার্ভার লিংক (যেমন <code>192.168.x.x</code>) অ্যাপ বন্ধ করলে কাজ করে না। আপনি এই ফাইলটি সেভ করে সরাসরি ফোনের ফাইল ম্যানেজার থেকে <b>Chrome ব্রাউজারে</b> ওপেন করতে পারবেন, অথবা <b>Netlify Drop / GitHub Pages</b>-এ আপলোড করলে একটি স্থায়ী অনলাইন লিংক পাবেন যা পৃথিবীর যেকোনো ফোন থেকে সবসময় চলবে!
+                    </p>
+                </div>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- ট্যাব ২: পার্মানেন্ট ফটো গ্যালারি (IndexedDB) -->
+            <!-- ==================================== -->
+            <div id="view-gallery" class="browser-view hidden space-y-4 max-w-4xl mx-auto">
+                <div class="panel-glass neon-border rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold neon-text"><i class="fa-solid fa-images"></i> পার্মানেন্ট ছবি গ্যালারি</h2>
+                        <p class="text-xs text-slate-300">এখানে রাখা ছবি কখনো মুছবে না। যত খুশি ছবি আপলোড করুন।</p>
+                    </div>
+                    <div>
+                        <input type="file" id="gallery-file-input" accept="image/*" multiple class="hidden" onchange="uploadPhotosToDB(event)">
+                        <button onclick="document.getElementById('gallery-file-input').click()" class="px-4 py-2.5 rounded-xl accent-bg font-bold text-xs flex items-center gap-2 active:scale-95 shadow-lg">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> ছবি আপলোড করুন
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- ট্যাব ৩: পার্মানেন্ট ফাইল ভল্ট (IndexedDB) -->
+            <!-- ==================================== -->
+            <div id="view-vault" class="browser-view hidden space-y-4 max-w-4xl mx-auto">
+                <div class="panel-glass neon-border rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold neon-text"><i class="fa-solid fa-vault"></i> পার্মানেন্ট ফাইল ভল্ট</h2>
+                        <p class="text-xs text-slate-300">PDF, অডিও, ভিডিও, ডকুমেন্ট বা যেকোনো ফাইল স্থায়ীভাবে জমা রাখুন।</p>
+                    </div>
+                    <div>
+                        <input type="file" id="vault-file-input" multiple class="hidden" onchange="uploadFilesToDB(event)">
+                        <button onclick="document.getElementById('vault-file-input').click()" class="px-4 py-2.5 rounded-xl accent-bg font-bold text-xs flex items-center gap-2 active:scale-95 shadow-lg">
+                            <i class="fa-solid fa-file-circle-plus"></i> ফাইল যুক্ত করুন
+                        </button>
+                    </div>
+                </div>
+
+                <div id="vault-list" class="space-y-2.5"></div>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- ট্যাব ৪: মেগা স্মার্ট নোটপ্যাড -->
+            <!-- ==================================== -->
+            <div id="view-notepad" class="browser-view hidden space-y-3 max-w-4xl mx-auto h-full flex flex-col">
+                <div class="panel-glass neon-border rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-xs text-slate-400 mr-1">ফন্ট:</span>
+                        <button onclick="changeNoteFont('font-modern')" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold">মডার্ন</button>
+                        <button onclick="changeNoteFont('font-code')" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-code">কোডিং</button>
+                        <button onclick="changeNoteFont('font-hand')" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs">হাতের লেখা</button>
+                        <button onclick="changeNoteFont('font-orbitron')" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-orbitron">রোবটিক</button>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="downloadNoteTxt()" class="px-3 py-1 rounded-lg accent-bg font-bold text-xs flex items-center gap-1">
+                            <i class="fa-solid fa-download"></i> সেভ (.txt)
+                        </button>
+                        <button onclick="copyNoteText()" class="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold">
+                            <i class="fa-solid fa-copy"></i> কপি
+                        </button>
+                    </div>
+                </div>
+
+                <!-- কাস্টম অন-স্ক্রিন কিবোর্ড বার -->
+                <div class="panel-glass border border-slate-800 rounded-xl p-2 flex items-center gap-1.5 overflow-x-auto">
+                    <span class="text-[10px] uppercase font-bold text-slate-400 px-1 shrink-0">কিবোর্ড:</span>
+                    <button onclick="insertAtCursor('{ }')" class="px-2.5 py-1 rounded bg-slate-800 text-xs font-code neon-text border border-slate-700">{ }</button>
+                    <button onclick="insertAtCursor('[ ]')" class="px-2.5 py-1 rounded bg-slate-800 text-xs font-code neon-text border border-slate-700">[ ]</button>
+                    <button onclick="insertAtCursor('( )')" class="px-2.5 py-1 rounded bg-slate-800 text-xs font-code neon-text border border-slate-700">( )</button>
+                    <button onclick="insertAtCursor('<div></div>')" class="px-2.5 py-1 rounded bg-slate-800 text-xs font-code neon-text border border-slate-700">&lt;div&gt;</button>
+                    <button onclick="insertAtCursor('console.log();')" class="px-2.5 py-1 rounded bg-slate-800 text-xs font-code neon-text border border-slate-700">log()</button>
+                    <button onclick="insertAtCursor('★ ')" class="px-2.5 py-1 rounded bg-slate-800 text-xs">★</button>
+                    <button onclick="insertAtCursor('✅ ')" class="px-2.5 py-1 rounded bg-slate-800 text-xs">✅</button>
+                    <button onclick="insertAtCursor('🔥 ')" class="px-2.5 py-1 rounded bg-slate-800 text-xs">🔥</button>
+                    <button onclick="insertAtCursor('📌 ')" class="px-2.5 py-1 rounded bg-slate-800 text-xs">📌</button>
+                </div>
+
+                <textarea id="smart-notepad-area" oninput="handleNoteInput()" placeholder="এখানে আপনার যেকোনো নোট, পাসওয়ার্ড বা আইডিয়া লিখুন... অটোমেটিক ব্রাউজারে সেভ হয়ে থাকবে।" class="w-full flex-1 min-h-[260px] panel-glass neon-border rounded-2xl p-4 text-base text-white outline-none resize-none font-modern"></textarea>
+
+                <div class="flex justify-between items-center text-xs text-slate-400 px-1">
+                    <span id="note-counter">শব্দ: 0 | অক্ষর: 0</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-check-circle"></i> অটো-সেভ চালু আছে</span>
+                </div>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- ট্যাব ৫: লাইভ কোডিং স্টুডিও -->
+            <!-- ==================================== -->
+            <div id="view-coder" class="browser-view hidden space-y-3 max-w-4xl mx-auto">
+                <div class="panel-glass neon-border rounded-2xl p-3 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold neon-text"><i class="fa-solid fa-code"></i> লাইভ HTML/CSS/JS কোডিং স্টুডিও</h2>
+                        <p class="text-[11px] text-slate-400">কোড লিখে "Run কোড" চাপুন, নিচেই লাইভ আউটপুট দেখতে পাবেন।</p>
+                    </div>
+                    <button onclick="runLiveCode()" class="px-4 py-2 rounded-xl accent-bg font-bold text-xs flex items-center gap-1.5 active:scale-95 shadow">
+                        <i class="fa-solid fa-play"></i> Run কোড
+                    </button>
+                </div>
+
+                <textarea id="live-code-editor" oninput="saveCodeToLocal()" class="w-full h-48 panel-glass neon-border rounded-2xl p-3 font-code text-xs sm:text-sm text-emerald-300 outline-none resize-none" placeholder="এখানে HTML কোড লিখুন..."></textarea>
+
+                <div class="panel-glass neon-border rounded-2xl overflow-hidden">
+                    <div class="bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-slate-400 border-b border-slate-800 flex items-center justify-between">
+                        <span>লাইভ আউটপুট প্রিভিউ</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    </div>
+                    <iframe id="live-code-preview" class="w-full h-56 bg-white border-0"></iframe>
+                </div>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- ট্যাব ৬: ভয়েস রেকর্ডার স্টুডিও (IndexedDB) -->
+            <!-- ==================================== -->
+            <div id="view-recorder" class="browser-view hidden space-y-4 max-w-4xl mx-auto">
+                <div class="panel-glass neon-border rounded-2xl p-5 text-center space-y-3">
+                    <div class="w-14 h-14 rounded-full accent-bg mx-auto flex items-center justify-center text-2xl shadow-lg">
+                        <i id="mic-status-icon" class="fa-solid fa-microphone"></i>
+                    </div>
+                    <h2 class="text-lg font-bold neon-text">পার্মানেন্ট ভয়েস রেকর্ডার</h2>
+                    <p id="record-timer" class="font-orbitron text-xl font-bold text-slate-200">00:00</p>
+                    <div class="flex justify-center gap-3">
+                        <button id="start-rec-btn" onclick="startAudioRecording()" class="px-5 py-2.5 rounded-xl accent-bg font-bold text-xs flex items-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-circle-dot"></i> রেকর্ড শুরু করুন
+                        </button>
+                        <button id="stop-rec-btn" onclick="stopAudioRecording()" disabled class="px-5 py-2.5 rounded-xl bg-rose-600 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-stop"></i> সেভ করুন
+                        </button>
+                    </div>
+                </div>
+
+                <div id="audio-recordings-list" class="space-y-2.5"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ফুল-স্ক্রিন ছবি ভিউয়ার মডাল -->
+    <div id="image-modal" class="hidden fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-2xl flex justify-between items-center mb-3">
+            <span id="modal-img-title" class="text-xs text-slate-300 truncate max-w-[65%]">ছবি</span>
+            <div class="flex gap-2">
+                <a id="modal-img-download" download="asif-photo.png" class="px-3 py-1.5 rounded-lg accent-bg font-bold text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-download"></i> ডাউনলোড
+                </a>
+                <button onclick="closeImageModal()" class="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold text-xs">
+                    <i class="fa-solid fa-xmark"></i> বন্ধ
+                </button>
+            </div>
+        </div>
+        <img id="modal-img-preview" src="" alt="Preview" class="max-h-[80vh] max-w-full rounded-xl border border-slate-700 object-contain">
+    </div>
+
+    <script>
+        /* ========================================================
+           ১. টোস্ট নোটিফিকেশন ফাংশন (alert() এর পরিবর্তে)
+        ======================================================== */
+        function showToast(msg) {
+            const toast = document.getElementById("toast-box");
+            toast.innerText = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2600);
+        }
+
+        /* ========================================================
+           ২. ফুল-স্ক্রিন জিরো-গ্র্যাভিটি লক সিস্টেম (ASIF KHAN)
+        ======================================================== */
+        const TARGET_SEQUENCE = ["A", "S", "I", "F", "K", "H", "A", "N"];
+        const DECOY_LETTERS = ["X", "Z", "Q", "M", "Y", "P", "V", "W"];
+        let slotAssignments = new Array(8).fill(null);
+        let floatingItems = [];
+        let animFrameId = null;
+
+        const gravityCanvas = document.getElementById("gravity-canvas");
+        const slotEls = document.querySelectorAll(".letter-slot");
+        const lockErrorEl = document.getElementById("lock-error-msg");
+
+        function initZeroGravityLock() {
+            gravityCanvas.innerHTML = "";
+            slotAssignments.fill(null);
+            slotEls.forEach(s => {
+                s.innerText = "";
+                s.classList.remove("filled");
+            });
+            lockErrorEl.innerText = "";
+
+            const allChars = [...TARGET_SEQUENCE, ...DECOY_LETTERS].sort(() => Math.random() - 0.5);
+            floatingItems = [];
+
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const topSafe = 95;
+            const bottomSafe = 230;
+
+            allChars.forEach((char, index) => {
+                const el = document.createElement("div");
+                el.className = "floating-letter";
+                el.innerText = char;
+
+                const startX = Math.random() * Math.max(40, w - 70) + 10;
+                const startY = Math.random() * Math.max(60, h - topSafe - bottomSafe) + topSafe;
+
+                const obj = {
+                    el: el,
+                    char: char,
+                    x: startX,
+                    y: startY,
+                    vx: (Math.random() - 0.5) * 1.8,
+                    vy: (Math.random() - 0.5) * 1.8,
+                    slotIndex: null,
+                    isDragging: false
+                };
+
+                el.style.left = obj.x + "px";
+                el.style.top = obj.y + "px";
+
+                attachLetterInteraction(el, obj);
+                floatingItems.push(obj);
+                gravityCanvas.appendChild(el);
+            });
+
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            animateZeroGravity();
+        }
+
+        function animateZeroGravity() {
+            const maxX = window.innerWidth - 60;
+            const minY = 85;
+            const maxY = window.innerHeight - 220;
+
+            floatingItems.forEach(item => {
+                if (item.slotIndex === null && !item.isDragging) {
+                    item.x += item.vx;
+                    item.y += item.vy;
+
+                    if (item.x <= 6) { item.x = 6; item.vx *= -1; }
+                    if (item.x >= maxX) { item.x = maxX; item.vx *= -1; }
+                    if (item.y <= minY) { item.y = minY; item.vy *= -1; }
+                    if (item.y >= maxY) { item.y = maxY; item.vy *= -1; }
+
+                    item.el.style.left = item.x + "px";
+                    item.el.style.top = item.y + "px";
+                }
+            });
+
+            animFrameId = requestAnimationFrame(animateZeroGravity);
+        }
+
+        function attachLetterInteraction(el, item) {
+            let offsetX = 0, offsetY = 0, downX = 0, downY = 0;
+
+            el.addEventListener("pointerdown", (e) => {
+                item.isDragging = true;
+                downX = e.clientX;
+                downY = e.clientY;
+                offsetX = e.clientX - item.x;
+                offsetY = e.clientY - item.y;
+                el.setPointerCapture(e.pointerId);
+            });
+
+            el.addEventListener("pointermove", (e) => {
+                if (!item.isDragging) return;
+                item.x = e.clientX - offsetX;
+                item.y = e.clientY - offsetY;
+                el.style.left = item.x + "px";
+                el.style.top = item.y + "px";
+            });
+
+            el.addEventListener("pointerup", (e) => {
+                if (!item.isDragging) return;
+                item.isDragging = false;
+
+                const movedDist = Math.hypot(e.clientX - downX, e.clientY - downY);
+
+                // যদি ট্যাপ/ক্লিক করা হয় (খুব কম নড়াচড়া)
+                if (movedDist < 10) {
+                    autoPlaceToNextSlot(item);
+                    return;
+                }
+
+                // ড্র্যাগ করে স্লটের ওপর ছাড়া হলে চেক করা
+                let droppedInSlot = false;
+                slotEls.forEach((slotEl, idx) => {
+                    const rect = slotEl.getBoundingClientRect();
+                    if (
+                        e.clientX >= rect.left - 12 &&
+                        e.clientX <= rect.right + 12 &&
+                        e.clientY >= rect.top - 12 &&
+                        e.clientY <= rect.bottom + 12
+                    ) {
+                        if (slotAssignments[idx] === null) {
+                            placeItemInSlot(item, idx);
+                            droppedInSlot = true;
+                        }
+                    }
+                });
+
+                // যদি বাইরে ছাড়া হয় তবে আবার ভাসতে থাকবে
+                if (!droppedInSlot) {
+                    item.vx = (Math.random() - 0.5) * 1.8;
+                    item.vy = (Math.random() - 0.5) * 1.8;
+                }
+            });
+        }
+
+        function autoPlaceToNextSlot(item) {
+            if (item.slotIndex !== null) return;
+            const nextEmpty = slotAssignments.indexOf(null);
+            if (nextEmpty !== -1) {
+                placeItemInSlot(item, nextEmpty);
+            } else {
+                showToast("সবগুলো ঘর পূর্ণ হয়ে গেছে!");
+            }
+        }
+
+        function placeItemInSlot(item, slotIdx) {
+            slotAssignments[slotIdx] = item;
+            item.slotIndex = slotIdx;
+            item.el.style.display = "none";
+            slotEls[slotIdx].innerText = item.char;
+            slotEls[slotIdx].classList.add("filled");
+            lockErrorEl.innerText = "";
+        }
+
+        function removeLetterFromSlot(slotIdx) {
+            const item = slotAssignments[slotIdx];
+            if (!item) return;
+            item.slotIndex = null;
+            item.el.style.display = "flex";
+            // মাঝামাঝি ভাসমান অবস্থায় ফেরত পাঠানো
+            item.x = Math.random() * (window.innerWidth - 80) + 15;
+            item.y = Math.random() * (window.innerHeight - 320) + 100;
+            slotAssignments[slotIdx] = null;
+            slotEls[slotIdx].innerText = "";
+            slotEls[slotIdx].classList.remove("filled");
+            lockErrorEl.innerText = "";
+        }
+
+        function attemptUnlock() {
+            const entered = slotAssignments.map(i => (i ? i.char : "")).join("");
+            if (entered === TARGET_SEQUENCE.join("")) {
+                document.getElementById("lock-screen").classList.add("hidden");
+                document.getElementById("browser-app").classList.remove("hidden");
+                showToast("স্বাগতম আসিফ খান! ব্রাউজার আনলক হয়েছে।");
+                refreshAllPermanentStores();
+            } else {
+                lockErrorEl.innerText = "ভুল হয়েছে! উপরে ASIF এবং নিচে KHAN সাজান।";
+            }
+        }
+
+        function lockBrowser() {
+            document.getElementById("browser-app").classList.add("hidden");
+            document.getElementById("lock-screen").classList.remove("hidden");
+            initZeroGravityLock();
+            showToast("ব্রাউজার লক করা হয়েছে");
+        }
+
+        /* ========================================================
+           ৩. ব্রাউজার ট্যাব, থিম ও কাস্টমাইজেশন সিস্টেম
+        ======================================================== */
+        function openBrowserTab(tabName, btnEl) {
+            document.querySelectorAll(".browser-view").forEach(v => v.classList.add("hidden"));
+            document.getElementById("view-" + tabName).classList.remove("hidden");
+
+            document.querySelectorAll(".tab-btn").forEach(b => {
+                b.classList.remove("accent-bg");
+                b.classList.add("bg-slate-800/80", "text-slate-300", "border", "border-slate-700");
+            });
+
+            if (btnEl) {
+                btnEl.classList.remove("bg-slate-800/80", "text-slate-300", "border", "border-slate-700");
+                btnEl.classList.add("accent-bg");
+            }
+
+            document.getElementById("browser-url-text").innerText = `https://asif-browser.cloud/${tabName}`;
+        }
+
+        function triggerTabClick(tabName) {
+            const tabs = ["home", "gallery", "vault", "notepad", "coder", "recorder"];
+            const idx = tabs.indexOf(tabName);
+            const btns = document.querySelectorAll(".tab-btn");
+            if (idx !== -1 && btns[idx]) {
+                openBrowserTab(tabName, btns[idx]);
+            }
+        }
+
+        function applyBrowserTheme(themeClass) {
+            const isGlowOff = document.body.classList.contains("glow-off");
+            document.body.className = themeClass + (isGlowOff ? " glow-off" : "");
+            localStorage.setItem("asif_theme", themeClass);
+            showToast("হোম স্ক্রিন থিম পরিবর্তন হয়েছে!");
+        }
+
+        function toggleLightingGlow() {
+            document.body.classList.toggle("glow-off");
+            const isOff = document.body.classList.contains("glow-off");
+            document.getElementById("glow-toggle-btn").innerHTML = isOff
+                ? '<i class="fa-solid fa-lightbulb"></i> লাইটিং: OFF'
+                : '<i class="fa-solid fa-lightbulb"></i> লাইটিং: ON';
+            localStorage.setItem("asif_glow_off", isOff ? "1" : "0");
+        }
+
+        function updateBrandName() {
+            const val = document.getElementById("custom-brand-input").value.trim();
+            if (!val) return showToast("একটি নাম লিখুন");
+            document.getElementById("header-app-name").innerText = val;
+            document.getElementById("lock-app-title").innerText = val;
+            localStorage.setItem("asif_brand_name", val);
+            showToast("ব্রাউজারের নাম আপডেট হয়েছে!");
+        }
+
+        function updateBrandLogo(iconClass) {
+            document.getElementById("header-logo-icon").className = "fa-solid " + iconClass;
+            document.getElementById("lock-logo-icon").className = "fa-solid " + iconClass + " neon-text text-xl";
+            localStorage.setItem("asif_brand_logo", iconClass);
+            showToast("লোগো পরিবর্তন করা হয়েছে!");
+        }
+
+        function copyBrowserLink() {
+            const url = window.location.href;
+            const tempInput = document.createElement("input");
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showToast("ব্রাউজার লিংক কপি হয়েছে!");
+        }
+
+        /* ========================================================
+           ৪. পার্মানেন্ট IndexedDB ডাটাবেস (ছবি, ফাইল, ভয়েস স্টোরেজ)
+        ======================================================== */
+        let dbInstance = null;
+
+        function openPermanentDB() {
+            return new Promise((resolve, reject) => {
+                if (dbInstance) return resolve(dbInstance);
+                const request = indexedDB.open("AsifBrowserPermanentDB", 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("photos")) db.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
+                    if (!db.objectStoreNames.contains("files")) db.createObjectStore("files", { keyPath: "id", autoIncrement: true });
+                    if (!db.objectStoreNames.contains("audios")) db.createObjectStore("audios", { keyPath: "id", autoIncrement: true });
+                };
+                request.onsuccess = (e) => {
+                    dbInstance = e.target.result;
+                    resolve(dbInstance);
+                };
+                request.onerror = (e) => reject(e);
+            });
+        }
+
+        async function addRecordToStore(storeName, record) {
+            const db = await openPermanentDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, "readwrite");
+                const store = tx.objectStore(storeName);
+                const req = store.add(record);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function getAllFromStore(storeName) {
+            const db = await openPermanentDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, "readonly");
+                const store = tx.objectStore(storeName);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function deleteFromStore(storeName, id) {
+            const db = await openPermanentDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, "readwrite");
+                const store = tx.objectStore(storeName);
+                const req = store.delete(id);
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        /* --- ছবি আপলোড ও গ্যালারি --- */
+        async function uploadPhotosToDB(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+            for (const file of files) {
+                await addRecordToStore("photos", {
+                    name: file.name,
+                    blob: file,
+                    date: new Date().toLocaleDateString("bn-BD")
+                });
+            }
+            e.target.value = "";
+            showToast(`${files.length}টি ছবি স্থায়ীভাবে সেভ হয়েছে!`);
+            refreshAllPermanentStores();
+        }
+
+        async function renderPermanentGallery() {
+            const photos = await getAllFromStore("photos");
+            document.getElementById("stat-photos").innerText = photos.length;
+            const grid = document.getElementById("gallery-grid");
+            grid.innerHTML = "";
+
+            if (photos.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-xs text-slate-400 py-8">এখনো কোনো ছবি আপলোড করা হয়নি।</div>`;
+                return;
+            }
+
+            photos.reverse().forEach(photo => {
+                const imgUrl = URL.createObjectURL(photo.blob);
+                const card = document.createElement("div");
+                card.className = "panel-glass neon-border rounded-2xl overflow-hidden flex flex-col";
+                card.innerHTML = `
+                    <img src="${imgUrl}" alt="${photo.name}" class="w-full h-32 object-cover cursor-pointer" onclick="openImageModal('${imgUrl}', '${photo.name.replace(/'/g, "")}')">
+                    <div class="p-2 flex items-center justify-between gap-1">
+                        <span class="text-[11px] truncate text-slate-300">${photo.name}</span>
+                        <button onclick="removePhoto(${photo.id})" class="text-rose-400 hover:text-rose-300 p-1 text-xs" title="মুছুন">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function removePhoto(id) {
+            await deleteFromStore("photos", id);
+            showToast("ছবি মুছে ফেলা হয়েছে");
+            refreshAllPermanentStores();
+        }
+
+        function openImageModal(url, title) {
+            document.getElementById("modal-img-preview").src = url;
+            document.getElementById("modal-img-title").innerText = title;
+            const dl = document.getElementById("modal-img-download");
+            dl.href = url;
+            dl.download = title || "asif-photo.png";
+            document.getElementById("image-modal").classList.remove("hidden");
+        }
+
+        function closeImageModal() {
+            document.getElementById("image-modal").classList.add("hidden");
+        }
+
+        /* --- ফাইল ভল্ট --- */
+        async function uploadFilesToDB(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+            for (const file of files) {
+                await addRecordToStore("files", {
+                    name: file.name,
+                    size: (file.size / 1024).toFixed(1) + " KB",
+                    type: file.type || "File",
+                    blob: file,
+                    date: new Date().toLocaleDateString("bn-BD")
+                });
+            }
+            e.target.value = "";
+            showToast(`${files.length}টি ফাইল স্থায়ী ভল্টে জমা হয়েছে!`);
+            refreshAllPermanentStores();
+        }
+
+        async function renderPermanentVault() {
+            const files = await getAllFromStore("files");
+            document.getElementById("stat-files").innerText = files.length;
+            const list = document.getElementById("vault-list");
+            list.innerHTML = "";
+
+            if (files.length === 0) {
+                list.innerHTML = `<div class="text-center text-xs text-slate-400 py-8">ভল্টে এখনো কোনো ফাইল নেই।</div>`;
+                return;
+            }
+
+            files.reverse().forEach(f => {
+                const fileUrl = URL.createObjectURL(f.blob);
+                const row = document.createElement("div");
+                row.className = "panel-glass neon-border rounded-2xl p-3 flex items-center justify-between gap-3";
+                row.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-xl accent-bg flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-file-shield"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-sm font-bold truncate">${f.name}</div>
+                            <div class="text-[11px] text-slate-400">${f.size} • ${f.date}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a href="${fileUrl}" download="${f.name}" class="px-3 py-1.5 rounded-lg accent-bg font-bold text-xs">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                        <button onclick="removeVaultFile(${f.id})" class="px-3 py-1.5 rounded-lg bg-rose-600/80 text-white text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        async function removeVaultFile(id) {
+            await deleteFromStore("files", id);
+            showToast("ফাইল মুছে ফেলা হয়েছে");
+            refreshAllPermanentStores();
+        }
+
+        /* ========================================================
+           ৫. স্মার্ট নোটপ্যাড ও লাইভ কোডিং স্টুডিও
+        ======================================================== */
+        function handleNoteInput() {
+            const area = document.getElementById("smart-notepad-area");
+            localStorage.setItem("asif_saved_note", area.value);
+            updateNoteStats();
+        }
+
+        function updateNoteStats() {
+            const text = document.getElementById("smart-notepad-area").value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            document.getElementById("note-counter").innerText = `শব্দ: ${words} | অক্ষর: ${text.length}`;
+        }
+
+        function changeNoteFont(fontClass) {
+            const area = document.getElementById("smart-notepad-area");
+            area.classList.remove("font-modern", "font-code", "font-hand", "font-orbitron");
+            area.classList.add(fontClass);
+            showToast("নোট ফন্ট স্টাইল পরিবর্তিত হয়েছে");
+        }
+
+        function insertAtCursor(snippet) {
+            const area = document.getElementById("smart-notepad-area");
+            const start = area.selectionStart;
+            const end = area.selectionEnd;
+            area.value = area.value.substring(0, start) + snippet + area.value.substring(end);
+            area.selectionStart = area.selectionEnd = start + snippet.length;
+            area.focus();
+            handleNoteInput();
+        }
+
+        function copyNoteText() {
+            const area = document.getElementById("smart-notepad-area");
+            area.select();
+            document.execCommand("copy");
+            showToast("নোট কপি করা হয়েছে!");
+        }
+
+        function downloadNoteTxt() {
+            const text = document.getElementById("smart-notepad-area").value;
+            const blob = new Blob([text], { type: "text/plain" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "asif-note.txt";
+            a.click();
+            showToast("নোট ফাইল ডাউনলোড হচ্ছে...");
+        }
+
+        function saveCodeToLocal() {
+            localStorage.setItem("asif_saved_code", document.getElementById("live-code-editor").value);
+        }
+
+        function runLiveCode() {
+            const code = document.getElementById("live-code-editor").value;
+            document.getElementById("live-code-preview").srcdoc = code;
+            showToast("কোড রান হয়েছে!");
+        }
+
+        /* ========================================================
+           ৬. পার্মানেন্ট ভয়েস রেকর্ডার স্টুডিও
+        ======================================================== */
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recInterval = null;
+        let recSeconds = 0;
+
+        async function startAudioRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+                    await addRecordToStore("audios", {
+                        title: "ভয়েস রেকর্ড #" + new Date().toLocaleTimeString("bn-BD"),
+                        blob: audioBlob,
+                        date: new Date().toLocaleDateString("bn-BD")
+                    });
+                    stream.getTracks().forEach(t => t.stop());
+                    showToast("ভয়েস রেকর্ড স্থায়ীভাবে সেভ হয়েছে!");
+                    refreshAllPermanentStores();
+                };
+
+                mediaRecorder.start();
+                document.getElementById("start-rec-btn").disabled = true;
+                document.getElementById("stop-rec-btn").disabled = false;
+                document.getElementById("mic-status-icon").classList.add("animate-pulse");
+
+                recSeconds = 0;
+                recInterval = setInterval(() => {
+                    recSeconds++;
+                    const m = String(Math.floor(recSeconds / 60)).padStart(2, "0");
+                    const s = String(recSeconds % 60).padStart(2, "0");
+                    document.getElementById("record-timer").innerText = `${m}:${s}`;
+                }, 1000);
+            } catch (err) {
+                showToast("মাইক্রোফোন পারমিশন পাওয়া যায়নি!");
+            }
+        }
+
+        function stopAudioRecording() {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+            }
+            clearInterval(recInterval);
+            document.getElementById("start-rec-btn").disabled = false;
+            document.getElementById("stop-rec-btn").disabled = true;
+            document.getElementById("mic-status-icon").classList.remove("animate-pulse");
+            document.getElementById("record-timer").innerText = "00:00";
+        }
+
+        async function renderPermanentAudios() {
+            const audios = await getAllFromStore("audios");
+            document.getElementById("stat-audios").innerText = audios.length;
+            const list = document.getElementById("audio-recordings-list");
+            list.innerHTML = "";
+
+            audios.reverse().forEach(item => {
+                const url = URL.createObjectURL(item.blob);
+                const div = document.createElement("div");
+                div.className = "panel-glass neon-border rounded-2xl p-3 space-y-2";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold neon-text">${item.title}</span>
+                        <button onclick="removeAudio(${item.id})" class="text-rose-400"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <audio controls src="${url}" class="w-full h-9"></audio>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        async function removeAudio(id) {
+            await deleteFromStore("audios", id);
+            showToast("রেকর্ডিং মুছে ফেলা হয়েছে");
+            refreshAllPermanentStores();
+        }
+
+        async function refreshAllPermanentStores() {
+            await renderPermanentGallery();
+            await renderPermanentVault();
+            await renderPermanentAudios();
+        }
+
+        /* ========================================================
+           ৭. অ্যাপ ইনিশিয়ালাইজেশন
+        ======================================================== */
+        window.onload = function () {
+            // সেভ করা থিম ও কাস্টমাইজেশন লোড করা
+            const savedTheme = localStorage.getItem("asif_theme");
+            if (savedTheme) document.body.className = savedTheme;
+
+            if (localStorage.getItem("asif_glow_off") === "1") {
+                document.body.classList.add("glow-off");
+                document.getElementById("glow-toggle-btn").innerHTML = '<i class="fa-solid fa-lightbulb"></i> লাইটিং: OFF';
+            }
+
+            const savedBrand = localStorage.getItem("asif_brand_name");
+            if (savedBrand) {
+                document.getElementById("header-app-name").innerText = savedBrand;
+                document.getElementById("lock-app-title").innerText = savedBrand;
+            }
+
+            const savedLogo = localStorage.getItem("asif_brand_logo");
+            if (savedLogo) {
+                document.getElementById("header-logo-icon").className = "fa-solid " + savedLogo;
+                document.getElementById("lock-logo-icon").className = "fa-solid " + savedLogo + " neon-text text-xl";
+            }
+
+            // নোট ও কোড লোড
+            document.getElementById("smart-notepad-area").value = localStorage.getItem("asif_saved_note") || "";
+            updateNoteStats();
+
+            const defaultSampleCode = `<div style="font-family:sans-serif; text-align:center; padding:30px; background:#0f172a; color:#38bdf8; border-radius:12px;">\n  <h2>হ্যালো আসিফ খান!</h2>\n  <p>আপনার লাইভ কোডিং স্টুডিও সচল আছে।</p>\n</div>`;
+            document.getElementById("live-code-editor").value = localStorage.getItem("asif_saved_code") || defaultSampleCode;
+            runLiveCode();
+
+            // জিরো গ্র্যাভিটি লক চালু করা
+            initZeroGravityLock();
+        };
+    </script>
+</body>
+</html>
